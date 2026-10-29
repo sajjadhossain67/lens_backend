@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lens
+      POSTGRES_PASSWORD: lens
+      POSTGRES_DB: lens
+    ports:
+      - "5432:5432"
+    volumes:
+      - lens_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lens -d lens"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    restart: unless-stopped
+    environment:
+      PORT: 4000
+      NODE_ENV: development
+      DATABASE_URL: postgres://lens:lens@postgres:5432/lens
+      FRONTEND_ORIGIN: http://localhost:3000
+      PUBLIC_SITE_URL: http://localhost:3000
+      LLM_PROVIDER: mock
+      ADMIN_TOKEN: change-me
+      IP_HASH_SALT: change-me
+      ROBOTS_CHECK: "true"
+      MAX_NEW_LENSES_PER_DAY: 500
+      TRUST_PROXY: "false"
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  lens_pgdata:

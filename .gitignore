@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+.pglite/
+.env
+.env.local
+.env.*.local
+!.env.example
+*.log
+*.tsbuildinfo
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
